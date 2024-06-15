@@ -1,0 +1,27 @@
+name: obodo_module_starter
+description: A new Flutter package project.
+version: 0.0.1
+
+environment:
+  sdk: '>=3.0.2 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: 
+  retrofit: 
+  shared_preferences: 
+  flutter_secure_storage: 
+  get_it: 
+  logger: 
+  permission_handler:
+  device_info_plus: 
+  uuid: 
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
