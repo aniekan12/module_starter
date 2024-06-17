@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  audioplayers: 
   dio: 
   retrofit: 
   shared_preferences: 

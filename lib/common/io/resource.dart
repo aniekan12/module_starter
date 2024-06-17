@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as developer;
 
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 
 import 'exceptions/obodo_exception.dart';
 import 'logger/logger_factory.dart';
+
+final log = logger();
 
 mixin NetworkBoundResource {
   @protected
@@ -111,13 +113,13 @@ mixin NetworkBoundResource {
         if (err is DioException) {
           controller
               .emitSafely(Resource.failure(ObodoException.fromHttpError(err)));
-          LoggerFactory.getLogger().error('DioException Error Exception', err);
+          log.e('DioException Error Exception', error: err);
         } else if (err is TypeError) {
-          LoggerFactory.getLogger().error('TypeError Exception', err);
+          log.e('TypeError Exception', error: err);
           controller
               .emitSafely(Resource.failure(ObodoException.fromTypeError(err)));
         }
-        log(err.toString());
+        developer.log(err.toString());
         controller.closeSafely();
       });
     }
