@@ -19,6 +19,7 @@ dependencies:
   permission_handler:
   device_info_plus: 
   uuid: 
+  dartz: ^0.10.1
 
 dev_dependencies:
   flutter_test:
