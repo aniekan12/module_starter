@@ -17,6 +17,8 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onResponse(
       Response<dynamic> response, ResponseInterceptorHandler handler) {
+    log.i(response.toString());
+
     log.i('RESPONSE URI: ${response.requestOptions.uri}'
         '\nMETHOD: ${response.requestOptions.method}'
         '\nHEADERS: ${_filterValues(response.headers.map)}'
