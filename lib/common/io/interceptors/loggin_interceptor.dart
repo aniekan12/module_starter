@@ -8,7 +8,7 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     log.i('REQUEST URI: ${options.uri}'
-        'METHOD:  ${options.method}'
+        '\nMETHOD:  ${options.method}'
         '\nHEADERS: ${options.headers}'
         '\nBODY:  ${options.data == null ? '' : options.data != Map ? options.data : _filterValues(options.data)}');
     return super.onRequest(options, handler);
@@ -18,7 +18,7 @@ class LoggingInterceptor extends Interceptor {
   void onResponse(
       Response<dynamic> response, ResponseInterceptorHandler handler) {
     log.i('RESPONSE URI: ${response.requestOptions.uri}'
-        'METHOD: ${response.requestOptions.method}'
+        '\nMETHOD: ${response.requestOptions.method}'
         '\nHEADERS: ${_filterValues(response.headers.map)}'
         '\nSTATUS CODE: ${response.statusCode}'
         '\nSTATUS MESSAGE: ${response.statusMessage}'
@@ -29,7 +29,7 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     log.e('URI: ${err.requestOptions.uri}'
-        'METHOD: ${err.requestOptions.method}'
+        '\nMETHOD: ${err.requestOptions.method}'
         '\nHEADERS: ${_filterValues(err.requestOptions.headers)}'
         '\nSTATUS CODE: ${err.response?.statusCode}'
         '\nSTATUS MESSAGE: ${err.response?.statusMessage}'
