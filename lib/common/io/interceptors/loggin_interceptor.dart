@@ -28,6 +28,7 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    log.e(err.toString());
     log.e('URI: ${err.requestOptions.uri}'
         '\nMETHOD: ${err.requestOptions.method}'
         '\nHEADERS: ${_filterValues(err.requestOptions.headers)}'
