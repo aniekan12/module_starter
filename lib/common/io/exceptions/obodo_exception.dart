@@ -140,6 +140,7 @@ class ObodoException implements Exception {
     if (errorBody.containsKey(responseCodeKey)) {
       final code =
           ObodoResponseType.fromCode('${errorBody[responseCodeKey] ?? ''}');
+      log(code.toString(), name: "code");
       switch (code) {
         case ObodoResponseType.inactiveAccount:
           return InActiveAccountException(
