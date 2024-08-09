@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:obodo_module_starter/common/io/interceptors/loggin_interceptor.dart';
 
@@ -58,7 +59,8 @@ class NotificationDispatcher {
   // Method to handle notification clicks
   void _handleNotificationClick(RemoteMessage message) {
     log.d("Notification clicked!");
-    // Handle the notification click event here
+    final notificationData = message.data;
+    debugPrint(notificationData.toString());
   }
 
   // Method to initialize local notifications
