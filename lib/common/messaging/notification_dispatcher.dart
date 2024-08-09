@@ -25,7 +25,6 @@ class NotificationDispatcher {
   }
 
   void _showNotification(RemoteMessage message) {
-    // Customize this method according to your needs
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
 
@@ -48,22 +47,18 @@ class NotificationDispatcher {
     }
   }
 
-  // Method to handle background messages
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await Firebase.initializeApp();
     log.d("Handling a background message: ${message.messageId}");
-    // You can also show notifications here if necessary
   }
 
-  // Method to handle notification clicks
   void _handleNotificationClick(RemoteMessage message) {
     log.d("Notification clicked!");
     final notificationData = message.data;
     debugPrint(notificationData.toString());
   }
 
-  // Method to initialize local notifications
   void _initializeLocalNotifications() {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -74,7 +69,6 @@ class NotificationDispatcher {
     _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  // Method to get the device token
   Future<String?> getDeviceToken() async {
     return await _firebaseMessaging.getToken();
   }
