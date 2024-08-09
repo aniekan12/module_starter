@@ -1,93 +1,77 @@
-// import 'dart:convert';
-// import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:obodo_module_starter/common/messaging/notification_factory.dart';
+class NotificationDispatcher {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
+  Future<void> initialize() async {
+    await _firebaseMessaging.requestPermission();
 
-// class NotificationDispatcher {
-//   NotificationDispatcher(
-//       {required FlutterLocalNotificationsPlugin plugin,
-//       this.parser = defaultMessageParser})
-//       : _plugin = plugin;
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      _showNotification(message);
+    });
 
-//   factory NotificationDispatcher.createDispatcher(
-//       NotificationServiceConfig config) {
-//     final pl = FlutterLocalNotificationsPlugin();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _handleNotificationClick(message);
+    });
+    _initializeLocalNotifications();
+  }
 
-//     AndroidInitializationSettings? androidInitSettings;
-//     DarwinInitializationSettings? iosInitSettings;
-//     final InitializationSettings notificationInitSettings;
+  void _showNotification(RemoteMessage message) {
+    // Customize this method according to your needs
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
 
-//     if (Platform.isAndroid) {
-//       final androidImplementation = pl.resolvePlatformSpecificImplementation<
-//           AndroidFlutterLocalNotificationsPlugin>();
-//       final group = AndroidNotificationChannelGroup(
-//         config.groupChannelId,
-//         config.groupChannelName,
-//         description: config.groupChannelDescription,
-//       );
+    if (notification != null && android != null) {
+      var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+        'channel_id',
+        'channel_name',
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: false,
+      );
+      var platformChannelSpecifics =
+          NotificationDetails(android: androidPlatformChannelSpecifics);
+      _flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        platformChannelSpecifics,
+      );
+    }
+  }
 
-//       androidImplementation?.deleteNotificationChannel(group.name);
-//       androidImplementation?.createNotificationChannelGroup(group);
+  // Method to handle background messages
+  static Future<void> _firebaseMessagingBackgroundHandler(
+      RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print("Handling a background message: ${message.messageId}");
+    // You can also show notifications here if necessary
+  }
 
-//       for (final info in config.channelInfo) {
-//         final notificationChannel = AndroidNotificationChannel(
-//           info.channelId,
-//           info.channelName,
-//           description: config.groupChannelDescription,
-//           importance: Importance.max,
-//           groupId: group.id,
-//         );
-//         androidImplementation?.createNotificationChannel(notificationChannel);
-//       }
+  // Method to handle notification clicks
+  void _handleNotificationClick(RemoteMessage message) {
+    print("Notification clicked!");
+    // Handle the notification click event here
+  }
 
-//       androidImplementation?.requestPermission();
+  // Method to initialize local notifications
+  void _initializeLocalNotifications() {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
-//       androidInitSettings =
-//           AndroidInitializationSettings(config.notificationIcon);
-//     } else if (Platform.isIOS) {
-//       iosInitSettings = const DarwinInitializationSettings();
-//     }
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
 
-//     notificationInitSettings = InitializationSettings(
-//         android: androidInitSettings, iOS: iosInitSettings);
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
 
-//     final dispatcher = NotificationDispatcher(plugin: pl);
-
-//     pl.initialize(notificationInitSettings,
-//         onDidReceiveNotificationResponse:
-//             dispatcher.onReceiveForegroundNotification);
-
-//     return dispatcher;
-//   }
-
-//   final FlutterLocalNotificationsPlugin _plugin;
-//   RemoteMessageParser parser;
-
-//   void onReceiveForegroundNotification(NotificationResponse details) {
-//     final payload = details.payload;
-
-//     if (null == payload) return;
-
-//     try {
-//       final value = jsonDecode(payload) as Map<String, dynamic>;
-//       final event = NotificationEvent.fromJson(value);
-//       DataBus.getInstance().publish(event, strategy: PublishStrategy.last);
-//     } catch (e) {
-//       LoggerFactory.getLogger().error('Failed to convert', e);
-//     }
-//     LoggerFactory.getLogger()
-//         .info('Received Notification Details => ${details.payload}');
-//   }
-
-//   Future<void> displayNotification({
-//     required int id,
-//     required NotificationDetails details,
-//     String? title,
-//     String? description,
-//     String? body
-//   }) async {
-//     await _plugin.show(id, title, description, details, payload: body);
-//   }
-// }
+  // Method to get the device token
+  Future<String?> getDeviceToken() async {
+    return await _firebaseMessaging.getToken();
+  }
+}
