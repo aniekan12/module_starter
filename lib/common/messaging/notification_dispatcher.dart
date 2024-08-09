@@ -11,7 +11,7 @@ class NotificationDispatcher {
 
   Future<void> initialize() async {
     await _firebaseMessaging.requestPermission();
-
+    await getDeviceToken();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showNotification(message);
     });
@@ -87,10 +87,9 @@ class NotificationDispatcher {
             android: initializationSettingsAndroid,
             iOS: initializationSettingsIOS);
 
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveBackgroundNotificationResponse: (notification) {
-      log.d("NOTIFICATION::: ${notification.payload}");
-    });
+    _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
   }
 
   Future<String?> getDeviceToken() async {
