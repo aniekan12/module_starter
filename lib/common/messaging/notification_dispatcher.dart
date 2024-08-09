@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:obodo_module_starter/common/io/interceptors/loggin_interceptor.dart';
 
 class NotificationDispatcher {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -16,6 +17,7 @@ class NotificationDispatcher {
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      log.d(message.toString());
       _handleNotificationClick(message);
     });
     _initializeLocalNotifications();
@@ -49,13 +51,13 @@ class NotificationDispatcher {
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await Firebase.initializeApp();
-    print("Handling a background message: ${message.messageId}");
+    log.d("Handling a background message: ${message.messageId}");
     // You can also show notifications here if necessary
   }
 
   // Method to handle notification clicks
   void _handleNotificationClick(RemoteMessage message) {
-    print("Notification clicked!");
+    log.d("Notification clicked!");
     // Handle the notification click event here
   }
 
