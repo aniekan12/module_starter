@@ -14,6 +14,7 @@ class NotificationDispatcher {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showNotification(message);
+      _handleNotificationClick(message);
     });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
