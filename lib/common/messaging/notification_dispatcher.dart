@@ -14,7 +14,6 @@ class NotificationDispatcher {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showNotification(message);
-      _handleNotificationClick(message);
     });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -88,7 +87,10 @@ class NotificationDispatcher {
             android: initializationSettingsAndroid,
             iOS: initializationSettingsIOS);
 
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveBackgroundNotificationResponse: (notification) {
+      log.d("NOTIFICATION::: ${notification.payload}");
+    });
   }
 
   Future<String?> getDeviceToken() async {
