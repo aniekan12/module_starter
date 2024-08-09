@@ -31,7 +31,7 @@ class NotificationDispatcher {
 
     if (notification != null && android != null) {
       var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'obodo_notification_channel_id',
+        '54y346u578u',
         'obodo_channel',
         importance: Importance.max,
         priority: Priority.high,
