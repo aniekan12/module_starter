@@ -50,7 +50,7 @@ class NotificationDispatcher {
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await Firebase.initializeApp();
-    log.d("Handling a background message: ${message.messageId}");
+    log.d("Handling a background message: ${message.data.toString()}");
   }
 
   void _handleNotificationClick(RemoteMessage message) {
