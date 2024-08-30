@@ -1,7 +1,6 @@
 enum ObodoResponseType {
   // General
-  ok('00'),
-  inactiveAccount('02'),
+  created('201'),
   processing('202'),
   success('200'),
   badRequest('400'),
