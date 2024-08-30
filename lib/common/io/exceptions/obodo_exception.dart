@@ -141,18 +141,6 @@ class ObodoException implements Exception {
       final code =
           ObodoResponseType.fromCode('${errorBody[responseCodeKey] ?? ''}');
       log(code.toString(), name: "code");
-      switch (code) {
-        case ObodoResponseType.inactiveAccount:
-          return InActiveAccountException(
-            message: errorBody[responseMessageKey] as String? ?? '',
-            cause: originalCause,
-            responseCode: errorBody[responseCodeKey] as String? ?? '-1',
-            phoneNumber: errorBody[phone] as String? ?? '',
-            email: errorBody[email] as String? ?? '',
-          );
-        default:
-          break;
-      }
     }
     return originalCause;
   }
