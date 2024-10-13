@@ -31,7 +31,7 @@ class DataBus {
     }
   }
 
-  static const dataBusKey = '@@__app_irecharge_data_bus__';
+  static const dataBusKey = '@@__app_obodo_data_bus__';
   final _mediator = StreamController<DataEvent>.broadcast();
   final _subscriptions = <StreamSubscription<DataEvent>>[];
   final _subscribers = <Type, List<Function>>{};
@@ -41,7 +41,7 @@ class DataBus {
   }
 
   void exclusive<T extends DataEvent>(void Function(T event) subscriber) {
-    if(_subscribers[T]?.isNotEmpty ?? false){
+    if (_subscribers[T]?.isNotEmpty ?? false) {
       return;
     }
     on<T>(subscriber);
@@ -57,7 +57,7 @@ class DataBus {
       if (eventCount >= count) {
         unsubscribe<T>(handler!);
       }
-      if (eventCount <= count){
+      if (eventCount <= count) {
         subscriber(e);
       }
     };
@@ -77,7 +77,7 @@ class DataBus {
   void unsubscribe<T extends DataEvent>(void Function(T event) subscriber) {
     _subscribers[T]?.remove(subscriber);
     final subscription =
-    _subscriptions.firstWhereOrNull((sub) => sub.onData == subscriber);
+        _subscriptions.firstWhereOrNull((sub) => sub.onData == subscriber);
     if (subscription != null) {
       subscription.cancel();
       _subscriptions.remove(subscription);
@@ -88,7 +88,8 @@ class DataBus {
   ///
   /// Depending on the [strategy], this method can notify all subscribers, only the
   /// first subscriber, or only the last subscriber of the event's type.
-  void publish(DataEvent event, {PublishStrategy strategy = PublishStrategy.all}) {
+  void publish(DataEvent event,
+      {PublishStrategy strategy = PublishStrategy.all}) {
     _mediator.add(event);
     final queue = _subscribers[event.runtimeType] ?? [];
 
@@ -107,7 +108,8 @@ class DataBus {
   }
 
   /// Publishes an event with a delay, according to the specified [strategy].
-  void publishDelayed(DataEvent event, Duration duration, {PublishStrategy strategy = PublishStrategy.all}) {
+  void publishDelayed(DataEvent event, Duration duration,
+      {PublishStrategy strategy = PublishStrategy.all}) {
     Future<void>.delayed(duration, () => publish(event, strategy: strategy));
   }
 
