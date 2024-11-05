@@ -43,7 +43,7 @@ class FirebaseService extends NotificationService {
   }
 
   void _onMessageReceived(RemoteMessage message) {
-    log.i(message);
+    log.i("$message message received");
     final event = _parser.call(message, NotificationType.foreground);
     try {
       (_handlers[event.messageType] ?? DefaultNotificationHandler(dispatcher))
@@ -54,7 +54,9 @@ class FirebaseService extends NotificationService {
   }
 
   void _onMessageOpenedApp(RemoteMessage message) {
-    log.i(message);
+    log.i(
+      "$message opened app",
+    );
 
     final event = _parser.call(message, NotificationType.foreground);
 
