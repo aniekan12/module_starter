@@ -35,6 +35,11 @@ class FirebaseService extends NotificationService {
     ).then((value) {
       FirebaseMessaging.onMessage.listen(_onMessageReceived);
       FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
     }).catchError((Object e) {
       log.e(
         'Unable to initialize app: $e',
