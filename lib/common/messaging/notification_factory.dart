@@ -155,18 +155,19 @@ class DefaultNotificationHandler extends NotificationHandler {
     DarwinNotificationDetails? iosSpecifics;
 
     if (Platform.isAndroid) {
-      androidSpecifics = AndroidNotificationDetails(
-        event.channelInfo.channelId,
-        event.channelInfo.channelName,
-        groupKey: event.channelInfo.groupKey,
-        importance: event.channelInfo.importance,
-        priority: event.priority,
-        number: event.notification?.android?.count ?? 0,
-        styleInformation: BigTextStyleInformation(
-          event.subTitle ?? event.description ?? '',
-          contentTitle: event.title,
-        ),
+      final bigPicture = BigPictureStyleInformation(
+        FilePathAndroidBitmap(event.imageUrl ?? ''),
+        summaryText: event.subTitle ?? event.description ?? '',
+        contentTitle: event.title,
+        largeIcon: FilePathAndroidBitmap(event.imageUrl ?? ''),
       );
+      androidSpecifics = AndroidNotificationDetails(
+          event.channelInfo.channelId, event.channelInfo.channelName,
+          groupKey: event.channelInfo.groupKey,
+          importance: event.channelInfo.importance,
+          priority: event.priority,
+          number: event.notification?.android?.count ?? 0,
+          styleInformation: bigPicture);
     } else if (Platform.isIOS) {
       final badgeCount =
           int.tryParse(event.notification?.apple?.badge ?? '') ?? 0;
@@ -194,7 +195,6 @@ class DefaultNotificationHandler extends NotificationHandler {
 ///
 NotificationEvent defaultMessageParser(RemoteMessage message,
     [NotificationType type = NotificationType.foreground]) {
-  // TODO(Zubby): implement a default parser
   return NotificationEvent(
       type: type,
       channelInfo: NotificationChannelInfo(
