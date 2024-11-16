@@ -4,21 +4,21 @@ import 'package:obodo_module_starter/common/io/ip_info.dart';
 import 'interceptors/loggin_interceptor.dart';
 
 class ApiClient {
-  ApiClient({required this.dio}) {
-    //do some configuration here
-  }
+  ApiClient({required this.dio});
 
   factory ApiClient.getInstance() {
     return GetIt.I<ApiClient>();
   }
 
-  static void inject({List<Interceptor> interceptors = const []}) async {
+  static Future<void> inject(
+      {List<Interceptor> interceptors = const []}) async {
     Map<String, dynamic> headers = {};
-    IpInfo().getPublicIP().then((ip) {
-      headers['x-forwarded-for'] = ip;
-    });
-    // if (ipAddress != null) {}
     headers['Content-Type'] = 'application/json';
+
+    final ip = await IpInfo().getPublicIP();
+    if (ip != null) {
+      headers['x-forwarded-for'] = ip;
+    }
 
     if (!GetIt.I.isRegistered<ApiClient>()) {
       GetIt.I.registerLazySingleton(() {
@@ -29,14 +29,11 @@ class ApiClient {
               ..options.receiveTimeout = const Duration(seconds: 120)
               ..options.connectTimeout = const Duration(seconds: 120))
           ..addInterceptor(LoggingInterceptor());
-        // .._initISRGCertificate();
 
         for (final element in interceptors) {
           apiClient.addInterceptor(element);
         }
 
-        // apiClient
-        //   ..addInterceptor(LoggingInterceptor())
         return apiClient;
       });
     }
