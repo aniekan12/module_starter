@@ -14,10 +14,10 @@ class ApiClient {
 
   static void inject({List<Interceptor> interceptors = const []}) async {
     Map<String, dynamic> headers = {};
-    final ipAddress = await IpInfo().getPublicIP();
-    if (ipAddress != null) {
-      headers['x-forwarded-for'] = ipAddress;
-    }
+    IpInfo().getPublicIP().then((ip) {
+      headers['x-forwarded-for'] = ip;
+    });
+    // if (ipAddress != null) {}
     headers['Content-Type'] = 'application/json';
 
     if (!GetIt.I.isRegistered<ApiClient>()) {
