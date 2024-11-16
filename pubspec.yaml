@@ -3,28 +3,29 @@ description: A new Flutter package project.
 version: 0.0.1
 
 environment:
-  sdk: '>=3.0.2 <4.0.0'
+  sdk: ">=3.0.2 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  audioplayers: 
-  dio: 
-  retrofit: 
-  shared_preferences: 
-  flutter_secure_storage: 
-  freezed_annotation: 
-  get_it: 
-  logger: 
+  audioplayers:
+  dio:
+  retrofit:
+  shared_preferences:
+  flutter_secure_storage:
+  freezed_annotation:
+  get_it:
+  logger:
   permission_handler:
-  device_info_plus: 
-  uuid: 
+  device_info_plus:
+  uuid:
   dartz: ^0.10.1
   firebase_app_installations:
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3
   flutter_local_notifications: ^17.2.3
+  http:
   # ios_communication_notification: ^1.0.4
 
 dev_dependencies:
