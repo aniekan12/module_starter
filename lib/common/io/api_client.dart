@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:obodo_module_starter/common/io/ip_info.dart';
 import 'interceptors/loggin_interceptor.dart';
 
 class ApiClient {
@@ -14,11 +13,6 @@ class ApiClient {
       {List<Interceptor> interceptors = const []}) async {
     Map<String, dynamic> headers = {};
     headers['Content-Type'] = 'application/json';
-
-    final ip = await IpInfo().getPublicIP();
-    if (ip != null) {
-      headers['x-forwarded-for'] = ip;
-    }
 
     if (!GetIt.I.isRegistered<ApiClient>()) {
       GetIt.I.registerLazySingleton(() {
