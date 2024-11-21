@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:obodo_module_starter/common/events/data_bus.dart';
 import 'package:obodo_module_starter/common/events/events.dart';
 import 'package:obodo_module_starter/common/messaging/notification_dispatcher.dart';
 import 'firebase_notification_service.dart';
@@ -140,10 +141,10 @@ class DefaultNotificationHandler extends NotificationHandler {
 
   @override
   Future<bool> notify(NotificationEvent event) async {
-    // if (event.type == NotificationType.foreground) {
-    //   DataBus.getInstance().publish(event);
-    //   return true;
-    // }
+    if (event.type == NotificationType.foreground) {
+      DataBus.getInstance().publish(event);
+      return true;
+    }
 
     if (event.title == null &&
         event.description == null &&
