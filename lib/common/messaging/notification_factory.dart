@@ -157,6 +157,12 @@ class DefaultNotificationHandler extends NotificationHandler {
         ),
       );
     } else if (Platform.isIOS) {
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
       final badgeCount =
           int.tryParse(event.notification?.apple?.badge ?? '') ?? 0;
       iosSpecifics = DarwinNotificationDetails(
