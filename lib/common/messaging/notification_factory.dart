@@ -140,17 +140,6 @@ class DefaultNotificationHandler extends NotificationHandler {
 
   @override
   Future<bool> notify(NotificationEvent event) async {
-    // if (event.type == NotificationType.foreground) {
-    //   DataBus.getInstance().publish(event);
-    //   return true;
-    // }
-
-    if (event.title == null &&
-        event.description == null &&
-        event.subTitle == null) {
-      return false;
-    }
-
     AndroidNotificationDetails? androidSpecifics;
     DarwinNotificationDetails? iosSpecifics;
 
@@ -179,6 +168,22 @@ class DefaultNotificationHandler extends NotificationHandler {
 
     final platformSpecifics =
         NotificationDetails(android: androidSpecifics, iOS: iosSpecifics);
+    if (event.type == NotificationType.foreground) {
+      await dispatcher.displayNotification(
+          id: event.notificationId,
+          details: platformSpecifics,
+          title: event.title,
+          description: event.description,
+          body: jsonEncode(event.toJson()));
+      return true;
+    }
+
+    if (event.title == null &&
+        event.description == null &&
+        event.subTitle == null) {
+      return false;
+    }
+
     await dispatcher.displayNotification(
         id: event.notificationId,
         details: platformSpecifics,
@@ -196,6 +201,7 @@ NotificationEvent defaultMessageParser(RemoteMessage message,
     [NotificationType type = NotificationType.foreground]) {
   return NotificationEvent(
       type: type,
+      data: message.toMap(),
       channelInfo: NotificationChannelInfo(
           channelId: 'channelId',
           channelName: 'channelName',

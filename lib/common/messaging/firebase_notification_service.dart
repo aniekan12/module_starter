@@ -32,10 +32,11 @@ class FirebaseService extends NotificationService {
     this.dispatcher = dispatcher;
     unawaited(Firebase.initializeApp(
       options: config.firebaseOptions,
-    ).then((value) {
+    ).then((value) async {
       FirebaseMessaging.onMessage.listen(_onMessageReceived);
       FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
-      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
