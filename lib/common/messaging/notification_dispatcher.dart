@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:obodo_module_starter/common/events/data_bus.dart';
 import 'package:obodo_module_starter/common/events/events.dart';
@@ -77,6 +78,11 @@ class NotificationDispatcher {
       final value = jsonDecode(payload) as Map<String, dynamic>;
       final event = NotificationEvent.fromJson(value);
       DataBus.getInstance().publish(event, strategy: PublishStrategy.last);
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
     } catch (e) {
       log.e(
         'Failed to convert $e',
