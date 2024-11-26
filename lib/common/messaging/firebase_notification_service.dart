@@ -35,6 +35,7 @@ class FirebaseService extends NotificationService {
     ).then((value) async {
       FirebaseMessaging.onMessage.listen(_onMessageReceived);
       FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
+      FirebaseMessaging.instance.getInitialMessage();
       await FirebaseMessaging.instance
           .setForegroundNotificationPresentationOptions(
         alert: true,
@@ -58,6 +59,8 @@ class FirebaseService extends NotificationService {
       log.e('Error Notifying Notification: $e');
     }
   }
+
+  void _getInitialMessage(RemoteMessage message) {}
 
   void _onMessageOpenedApp(RemoteMessage message) {
     log.i(
