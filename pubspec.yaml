@@ -22,7 +22,7 @@ dependencies:
   uuid:
   dartz: ^0.10.1
   firebase_app_installations:
-  firebase_core: ^2.15.0
+  # firebase_core: ^2.15.0
   http:
   # ios_communication_notification: ^1.0.4
 
