@@ -20,7 +20,7 @@ abstract class DeviceInfoProvider {
     if (!GetIt.I.isRegistered<DeviceInfoProvider>()) {
       GetIt.I.registerSingletonWithDependencies<DeviceInfoProvider>(() {
         return _DeviceInformationProviderImpl(
-          const MethodChannel('irecharge.flutter.dev/device_manager'),
+          const MethodChannel('obodo.flutter.dev/device_manager'),
           SharedPreferenceProvider.getInstance(),
         );
       }, dependsOn: [SharedPreferenceProvider]);
