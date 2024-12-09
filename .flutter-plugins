@@ -15,6 +15,7 @@ flutter_secure_storage_linux=/Users/apple/.pub-cache/hosted/pub.dev/flutter_secu
 flutter_secure_storage_macos=/Users/apple/.pub-cache/hosted/pub.dev/flutter_secure_storage_macos-3.1.2/
 flutter_secure_storage_web=/Users/apple/.pub-cache/hosted/pub.dev/flutter_secure_storage_web-1.2.1/
 flutter_secure_storage_windows=/Users/apple/.pub-cache/hosted/pub.dev/flutter_secure_storage_windows-3.1.2/
+package_info_plus=/Users/apple/.pub-cache/hosted/pub.dev/package_info_plus-8.1.1/
 path_provider=/Users/apple/.pub-cache/hosted/pub.dev/path_provider-2.1.4/
 path_provider_android=/Users/apple/.pub-cache/hosted/pub.dev/path_provider_android-2.2.9/
 path_provider_foundation=/Users/apple/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.0/
