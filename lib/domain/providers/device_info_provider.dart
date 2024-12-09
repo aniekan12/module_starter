@@ -48,7 +48,7 @@ class _DeviceInformationProviderImpl extends DeviceInfoProvider {
     this.iosChannel,
     this.provider,
   );
-  static const _deviceIdKey = 'irecharge_android_device_id';
+  static const _deviceIdKey = 'obodo_android_device_id';
 
   final DeviceInfoPlugin _deviceManager = DeviceInfoPlugin();
   final _platform = _$DevicePlatformImpl();
@@ -105,40 +105,18 @@ class _DeviceInformationProviderImpl extends DeviceInfoProvider {
         deviceOS: platform.isAndroid ? 'ANDROID' : 'IOS');
   }
 
-  int _getAppFlavor() {
-    const flavor =
-        String.fromEnvironment('APP_FLAVOR', defaultValue: 'business');
-    if (flavor == 'business') {
-      return 1;
-    } else {
-      return 2;
-    }
-  }
-
-  String _getAppEnv() {
-    const appEnv = String.fromEnvironment('APP_ENV', defaultValue: 'local');
-    return switch (appEnv) {
-      'dev' => '1',
-      'staging' => '2',
-      'beta' => '3',
-      'prod' => '4',
-      _ => '5'
-    };
-  }
-
   Future<void> _resetIosDeviceId(IosDeviceInfo deviceInfo) async {
     //So we need to check if we have the deviceId saved in the keychin
     //Because the identifierForVendor isn't retained during uninstalls and
     //re-install on a particular device, however the value on the keychain
     //remains forever on the device except for a hard factory reset though.
-    final flavor = _getAppFlavor();
-    final appEnv = _getAppEnv();
+    const flavor = 'prod';
 
     final persistedDeviceId = await _getPersistedDeviceId();
     if (persistedDeviceId == null) {
       //We are appending the flavor and appEnv to differentiate the vendorId for
 
-      _deviceId = '${deviceInfo.identifierForVendor}-$flavor-$appEnv';
+      _deviceId = '${deviceInfo.identifierForVendor}-$flavor';
       if (_deviceId != null) {
         final isPersisted = await _persistDeviceId(_deviceId!);
         if (isPersisted == false) {
