@@ -1,13 +1,6 @@
-import 'dart:async';
 import 'dart:io';
-
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
-import 'package:obodo_module_starter/common/models/device_information.dart';
-import 'package:uuid/uuid.dart';
-
-import 'shared_preference_provider.dart';
 
 abstract class DeviceInfoProvider {
   const DeviceInfoProvider();
@@ -16,172 +9,94 @@ abstract class DeviceInfoProvider {
     return GetIt.I<DeviceInfoProvider>();
   }
 
-  static void inject() {
+  static Future<void> inject() async {
     if (!GetIt.I.isRegistered<DeviceInfoProvider>()) {
-      GetIt.I.registerSingletonWithDependencies<DeviceInfoProvider>(() {
-        return _DeviceInformationProviderImpl(
-          const MethodChannel('obodo.flutter.dev/device_manager'),
-          SharedPreferenceProvider.getInstance(),
-        );
-      }, dependsOn: [SharedPreferenceProvider]);
+      final provider = _DeviceInfoProviderImpl();
+      await provider.initialize();
+      GetIt.I.registerLazySingleton<DeviceInfoProvider>(() => provider);
     }
   }
-
-  Future<DeviceInformation> getDeviceInfo();
-
-  String? get deviceId;
-
-  String? get deviceVersion;
-
-  String? get deviceBrandName;
 
   String? get deviceName;
-
-  int get androidSdkInt;
-
-  DevicePlatform get platform;
+  String? get deviceVersion;
+  String? get deviceModel;
+  String? get deviceId;
+  String get platform;
+  Map<String, dynamic> get deviceInfo;
 }
 
-///====================DeviceProviderInformationImplementation==================
-class _DeviceInformationProviderImpl extends DeviceInfoProvider {
-  _DeviceInformationProviderImpl(
-    this.iosChannel,
-    this.provider,
-  );
-  static const _deviceIdKey = 'obodo_android_device_id';
+class _DeviceInfoProviderImpl extends DeviceInfoProvider {
+  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  bool _isInitialized = false;
+  Map<String, dynamic> _deviceData = {};
 
-  final DeviceInfoPlugin _deviceManager = DeviceInfoPlugin();
-  final _platform = _$DevicePlatformImpl();
-
-  final MethodChannel iosChannel;
-  final SharedPreferenceProvider provider;
-
-  String? _deviceName;
-  String? _deviceVersion;
-  String? _deviceBrandName;
-  String? _deviceId;
-  int _androidSdkInt = 0;
-
-  @override
-  String? get deviceId => _deviceId;
-
-  @override
-  String? get deviceVersion => _deviceVersion;
-
-  @override
-  String? get deviceBrandName => _deviceBrandName;
-
-  @override
-  String? get deviceName => _deviceName;
-
-  @override
-  DevicePlatform get platform => _platform;
-
-  @override
-  int get androidSdkInt => _androidSdkInt;
-
-  @override
-  Future<DeviceInformation> getDeviceInfo() async {
-    if (platform.isAndroid) {
-      final value = await _deviceManager.androidInfo;
-      _deviceName = value.device;
-      _deviceVersion = value.version.codename;
-      _deviceBrandName = value.brand;
-      _androidSdkInt = value.version.sdkInt;
-      _deviceId = await _provideAndroidDeviceId();
-    } else if (platform.isIOS) {
-      final value = await _deviceManager.iosInfo;
-      unawaited(_resetIosDeviceId(value));
-      _deviceName = value.name;
-      _deviceVersion = value.systemVersion;
-      _deviceBrandName = value.localizedModel;
-    }
-
-    return DeviceInformation(
-        deviceId: _deviceId ?? '',
-        deviceName: _deviceName ?? '',
-        deviceVersion: _deviceVersion ?? '',
-        deviceBrandName: _deviceBrandName ?? '',
-        deviceOS: platform.isAndroid ? 'ANDROID' : 'IOS');
-  }
-
-  Future<void> _resetIosDeviceId(IosDeviceInfo deviceInfo) async {
-    //So we need to check if we have the deviceId saved in the keychin
-    //Because the identifierForVendor isn't retained during uninstalls and
-    //re-install on a particular device, however the value on the keychain
-    //remains forever on the device except for a hard factory reset though.
-    const flavor = 'prod';
-
-    final persistedDeviceId = await _getPersistedDeviceId();
-    if (persistedDeviceId == null) {
-      //We are appending the flavor and appEnv to differentiate the vendorId for
-
-      _deviceId = '${deviceInfo.identifierForVendor}-$flavor';
-      if (_deviceId != null) {
-        final isPersisted = await _persistDeviceId(_deviceId!);
-        if (isPersisted == false) {
-          //There's really nothing we can do here
-          //because the reason why it wouldn't save in the first place
-          //must have been dealt with
+  Future<void> initialize() async {
+    if (!_isInitialized) {
+      try {
+        if (Platform.isAndroid) {
+          final androidInfo = await _deviceInfo.androidInfo;
+          _deviceData = {
+            'platform': 'android',
+            'device_name': androidInfo.model,
+            'device_version': androidInfo.version.release,
+            'device_model': androidInfo.manufacturer,
+            'device_id': androidInfo.id,
+            'sdk_version': androidInfo.version.sdkInt.toString(),
+            'brand': androidInfo.brand,
+            'hardware': androidInfo.hardware,
+            'is_physical_device': androidInfo.isPhysicalDevice,
+          };
+        } else if (Platform.isIOS) {
+          final iosInfo = await _deviceInfo.iosInfo;
+          _deviceData = {
+            'platform': 'ios',
+            'device_name': iosInfo.name,
+            'device_version': iosInfo.systemVersion,
+            'device_model': iosInfo.model,
+            'device_id': iosInfo.identifierForVendor,
+            'is_physical_device': iosInfo.isPhysicalDevice,
+            'system_name': iosInfo.systemName,
+            'utsname': {
+              'release': iosInfo.utsname.release,
+              'version': iosInfo.utsname.version,
+              'machine': iosInfo.utsname.machine,
+            },
+          };
+        } else {
+          _deviceData = {
+            'platform': 'unknown',
+            'device_name': 'unknown',
+            'device_version': 'unknown',
+            'device_model': 'unknown',
+            'device_id': 'unknown',
+          };
         }
-      } else {
-        //A very unlikely situation but there's a possibility that
-        //the ios identifierForVendor returns nil. we simply have to wait and
-        // retry
-        Future.delayed(const Duration(seconds: 120), () {
-          _resetIosDeviceId(deviceInfo);
-        });
+        _isInitialized = true;
+      } catch (e) {
+        _deviceData = {
+          'platform': 'error',
+          'error': e.toString(),
+        };
+        rethrow;
       }
-    } else {
-      _deviceId = persistedDeviceId;
     }
   }
 
-  Future<String> _provideAndroidDeviceId() async {
-    final persistedDeviceId = provider.getValue<String>(_deviceIdKey);
-
-    if (null != persistedDeviceId && persistedDeviceId.isNotEmpty) {
-      return persistedDeviceId;
-    }
-
-    final keys = [
-      const Symbol('deviceVersion'),
-      const Symbol('deviceBrand'),
-      const Symbol('deviceName'),
-    ];
-
-    final values = [_deviceName, _deviceVersion, _deviceBrandName];
-
-    final deviceId = const Uuid()
-        .v4(options: {'namedArgs': Map.fromIterables(keys, values)});
-
-    await provider.saveValue(_deviceIdKey, deviceId);
-
-    return deviceId;
-  }
-
-  Future<String?> _getPersistedDeviceId() {
-    return iosChannel.invokeMethod('get_device_id');
-  }
-
-  Future<bool?> _persistDeviceId(String deviceId) {
-    return iosChannel.invokeMethod('set_device_id', {'deviceId': deviceId});
-  }
-}
-
-abstract class DevicePlatform {
-  bool get isIOS;
-  bool get isAndroid;
-  String get deviceType;
-}
-
-class _$DevicePlatformImpl extends DevicePlatform {
   @override
-  bool get isAndroid => Platform.isAndroid;
+  String? get deviceName => _deviceData['device_name'];
 
   @override
-  bool get isIOS => Platform.isIOS;
+  String? get deviceVersion => _deviceData['device_version'];
 
   @override
-  String get deviceType => isAndroid ? 'ANROID' : 'IOS';
+  String? get deviceModel => _deviceData['device_model'];
+
+  @override
+  String? get deviceId => _deviceData['device_id'];
+
+  @override
+  String get platform => _deviceData['platform'] ?? 'unknown';
+
+  @override
+  Map<String, dynamic> get deviceInfo => Map<String, dynamic>.from(_deviceData);
 }
