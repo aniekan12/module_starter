@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:dio/dio.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 
 import 'exceptions/obodo_exception.dart';
 import 'logger/logger_factory.dart';
@@ -791,7 +791,9 @@ class _NetworkBoundResourceImpl<S> extends Resource<S> {
         _controller.sink.add(value);
       }
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 
@@ -801,7 +803,9 @@ class _NetworkBoundResourceImpl<S> extends Resource<S> {
         _controller.close();
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
